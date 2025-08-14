@@ -62,7 +62,7 @@
             <label for="programLevel" class="block text-gray-700 text-sm font-semibold mb-1">Select Program Level</label>
             <select id="programLevel" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
               <option value="elementary">Elementary (Kinder - Grade 6)</option>
-              <option value="jhs" selected>Junior High School (Grades 7 - 10)</option>
+              <option value="jhs">Junior High School (Grades 7 - 10)</option>
               <option value="shs">Senior High School (Grades 11 - 12)</option>
             </select>
           </div>
@@ -75,6 +75,7 @@
         </div>
 
         <div class="flex items-center justify-end gap-3 mt-6">
+          <button id="saveParametersBtn" class="px-5 py-3 rounded-xl border hover:bg-gray-50">Save Parameters</button>
           <button id="proceedBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-5 py-3 rounded-xl shadow">Continue to Teacher Assignments</button>
         </div>
       </section>
@@ -154,7 +155,7 @@
     <div class="bg-white rounded-2xl shadow-xl p-6 w-[95vw] max-w-2xl">
       <h3 class="text-lg font-bold mb-2">Paste Teacher List</h3>
       <p class="text-sm text-gray-600 mb-4">One record per line in the format: <span class="font-mono">Teacher Name, Subject, Grade Level, Section</span></p>
-      <textarea id="pasteArea" class="w-full border rounded-lg p-3 h-48" placeholder="e.g.,\nJuan Dela Cruz, Mathematics, Grade 7, A\nMaria Santos, English, Grade 7, A"></textarea>
+      <textarea id="pasteArea" class="w-full border rounded-lg p-3 h-48" placeholder="e.g.,&#10;Juan Dela Cruz, Mathematics, Grade 7, A&#10;Maria Santos, English, Grade 7, A"></textarea>
       <div class="flex items-center justify-end gap-3 mt-4">
         <button id="cancelPasteBtn" class="px-4 py-2 rounded-xl border hover:bg-gray-50">Cancel</button>
         <button id="applyPasteBtn" class="px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700">Add to Table</button>
@@ -213,6 +214,7 @@
     const teacherScheduleContainer = document.getElementById('teacher-schedule-container');
     const teacherSelector = document.getElementById('teacherSelector');
 
+    const saveParametersBtn = document.getElementById('saveParametersBtn');
     const proceedBtn = document.getElementById('proceedBtn');
     const backBtn = document.getElementById('backBtn');
 
@@ -434,8 +436,10 @@
           setSectionsInputs(paramsData.sectionsConfig); // Set the values from saved data
           showView(mainView); // Jump to main view if parameters exist
         } else {
-          showView(setupView);
+          // Set a default and generate inputs if no data exists
+          programLevelSelect.value = 'jhs';
           generateSectionsInputs();
+          showView(setupView);
         }
         
         // Then load teacher data if a schedule exists
@@ -458,8 +462,10 @@
 
       } catch (e) {
         console.error(e);
-        showView(setupView);
+        // Default to setup view if there's any error loading from Firestore
+        programLevelSelect.value = 'jhs';
         generateSectionsInputs();
+        showView(setupView);
       }
     }
 
@@ -649,22 +655,24 @@
         await loadDataFromFirestore();
       } else {
         userIdDisplay.textContent = 'User ID: Not authenticated';
-        showView(setupView);
+        programLevelSelect.value = 'jhs'; // Set a default value
         generateSectionsInputs();
+        showView(setupView);
       }
     });
 
     // Event listeners
     programLevelSelect.addEventListener('change', generateSectionsInputs);
 
-    proceedBtn.addEventListener('click', async () => {
-      // Get sections config from inputs
+    saveParametersBtn.addEventListener('click', async () => {
       const sectionsConfig = getSectionsConfig();
+      await saveParametersToFirestore(programLevelSelect.value, sectionsConfig);
+    });
 
-      // Save parameters and generate placeholder rows
+    proceedBtn.addEventListener('click', async () => {
+      const sectionsConfig = getSectionsConfig();
       await saveParametersToFirestore(programLevelSelect.value, sectionsConfig);
 
-      // Create placeholder rows based on sections
       let placeholderLines = [];
       for (const grade in sectionsConfig) {
         const count = sectionsConfig[grade];
@@ -689,9 +697,7 @@
     printBtn.addEventListener('click', () => window.print());
 
     viewTeacherBtn.addEventListener('click', () => {
-      // Ensure schedule exists
       if (!schoolSchedule) { toast('Generate a schedule first.', 'warning'); return; }
-      // Populate selector from current table
       const { teachers } = parseTeachers();
       populateTeacherSelector(teachers);
       showView(teacherView);
