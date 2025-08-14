@@ -20,712 +20,338 @@
     /* Simple fade for views */
     .fade-in { animation: fade .25s ease-out both; }
     @keyframes fade { from { opacity: .0; transform: translateY(4px);} to { opacity: 1; transform: translateY(0);} }
+
+    /* Custom scrollbar for better visibility */
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-track { background: #e2e8f0; }
+    ::-webkit-scrollbar-thumb { background-color: #94a3b8; border-radius: 5px; border: 2px solid #e2e8f0; }
+    ::-webkit-scrollbar-thumb:hover { background-color: #64748b; }
   </style>
 </head>
-<body class="bg-gray-100 min-h-screen">
-  <div class="max-w-7xl mx-auto p-4 md:p-8">
-    <!-- Header -->
-    <header class="bg-white shadow-sm rounded-2xl px-6 py-4 mb-6 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-indigo-600/10 flex items-center justify-center">
-          <span class="text-xl font-bold text-indigo-700">DG</span>
-        </div>
-        <div>
-          <h1 class="text-2xl md:text-3xl font-extrabold text-indigo-800">DepEd Class Schedule Generator</h1>
-          <p class="text-sm text-gray-500">Generate daily schedules from teacher assignments</p>
-        </div>
-      </div>
-      <div class="text-xs md:text-sm text-gray-500 max-w-[60%] truncate" id="userIdDisplay"></div>
+<body class="p-6 md:p-10">
+
+  <!-- Main View -->
+  <div id="mainView" class="container mx-auto fade-in">
+    <header class="text-center mb-10">
+      <h1 class="text-3xl md:text-4xl font-bold text-slate-800">DepEd Class Schedule Generator</h1>
+      <p class="text-slate-500 mt-2">Create and view schedules for multiple teachers.</p>
     </header>
 
-    <!-- Stepper -->
-    <div class="bg-white rounded-2xl shadow-sm p-4 md:p-6 mb-6">
-      <ol class="flex items-center w-full">
-        <li class="flex items-center w-1/2" id="stepper-1">
-          <span class="flex items-center justify-center w-8 h-8 mr-2 text-sm font-medium rounded-full bg-indigo-600 text-white">1</span>
-          <span class="text-sm md:text-base font-medium">Set School Parameters</span>
-          <span class="flex-auto border-t ml-2 border-gray-200"></span>
-        </li>
-        <li class="flex items-center w-1/2" id="stepper-2">
-          <span class="flex items-center justify-center w-8 h-8 mr-2 text-sm font-medium rounded-full bg-gray-200 text-gray-700">2</span>
-          <span class="text-sm md:text-base font-medium text-gray-500">Enter Teachers & Generate</span>
-        </li>
-      </ol>
+    <div class="bg-white shadow-xl rounded-2xl p-6 md:p-10 mb-10">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-2xl font-semibold text-slate-700">Teacher List</h2>
+        <div class="flex space-x-2">
+            <button id="addRowBtn" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-full transition-colors duration-200 shadow-md">
+                Add Teacher
+            </button>
+            <button id="importPasteBtn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-full transition-colors duration-200 shadow-md">
+                Paste CSV
+            </button>
+        </div>
+      </div>
+
+      <!-- Table Section -->
+      <div class="overflow-x-auto relative rounded-xl border border-gray-200">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subjects</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
+            </tr>
+          </thead>
+          <tbody id="teacherTbody" class="bg-white divide-y divide-gray-200">
+            <!-- Table rows will be inserted here by JavaScript -->
+          </tbody>
+        </table>
+      </div>
+
+      <div class="mt-6 hidden">
+        <textarea id="teachersInput" rows="10" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="TeacherName;Subject1,Subject2,Subject3"></textarea>
+      </div>
     </div>
 
-    <!-- Views Container -->
-    <div class="bg-white rounded-2xl shadow-md p-4 md:p-6">
-      <!-- Setup View -->
-      <section id="setup-view" class="fade-in">
-        <div class="grid md:grid-cols-2 items-end gap-4">
-          <div>
-            <label for="programLevel" class="block text-gray-700 text-sm font-semibold mb-1">Select Program Level</label>
-            <select id="programLevel" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-              <option value="elementary">Elementary (Kinder - Grade 6)</option>
-              <option value="jhs">Junior High School (Grades 7 - 10)</option>
-              <option value="shs">Senior High School (Grades 11 - 12)</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="mt-6">
-          <h2 class="text-lg font-semibold text-indigo-700 mb-2">Sections per Grade</h2>
-          <p class="text-sm text-gray-500 mb-4">Specify how many sections each grade level has. Letters (A, B, C…) will be auto-assigned.</p>
-          <div id="sections-input-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-        </div>
-
-        <div class="flex items-center justify-end gap-3 mt-6">
-          <button id="saveParametersBtn" class="px-5 py-3 rounded-xl border hover:bg-gray-50">Save Parameters</button>
-          <button id="proceedBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-5 py-3 rounded-xl shadow">Continue to Teacher Assignments</button>
-        </div>
-      </section>
-
-      <!-- Main View -->
-      <section id="main-view" class="hidden fade-in">
-        <!-- Hidden original textarea to keep compatibility with existing parsing/saving logic -->
-        <textarea id="teachersInput" rows="8" class="sr-only"></textarea>
-
-        <div class="flex items-center justify-between gap-3 mb-4">
-          <h2 class="text-xl font-bold text-indigo-700">Teacher Assignments</h2>
-          <div class="flex items-center gap-2">
-            <button id="importPasteBtn" class="px-3 py-2 rounded-lg border hover:bg-gray-50">Paste List</button>
-            <button id="addRowBtn" class="px-3 py-2 rounded-lg bg-gray-800 text-white hover:bg-black">Add Row</button>
-          </div>
-        </div>
-
-        <div class="overflow-x-auto border rounded-xl">
-          <table class="min-w-full text-sm" id="teacherTable">
-            <thead class="bg-gray-50 text-gray-700">
-              <tr>
-                <th class="p-3 text-left">Teacher Name</th>
-                <th class="p-3 text-left">Subject</th>
-                <th class="p-3 text-left">Grade</th>
-                <th class="p-3 text-left">Section</th>
-                <th class="p-3 text-center w-20">Actions</th>
-              </tr>
-            </thead>
-            <tbody id="teacherTbody" class="divide-y"></tbody>
-          </table>
-        </div>
-        <p class="text-xs text-gray-500 mt-2">Tip: Use TAB to move across fields. Subjects and Grades have dropdowns to avoid typos.</p>
-
-        <div class="flex flex-wrap items-center gap-3 mt-6">
-          <button id="generateBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-5 py-3 rounded-xl shadow">Generate School-wide Schedule</button>
-          <button id="exportCsvBtn" class="px-4 py-3 rounded-xl border hover:bg-gray-50">Export CSV</button>
-          <button id="printBtn" class="px-4 py-3 rounded-xl border hover:bg-gray-50">Print</button>
-          <button id="viewTeacherBtn" class="px-4 py-3 rounded-xl border hover:bg-gray-50">View Teacher Program</button>
-        </div>
-
-        <div class="mt-8 pt-6 border-t">
-          <h3 class="text-xl font-bold text-indigo-700 mb-4">School-wide Schedule</h3>
-          <div id="school-schedule-container" class="overflow-x-auto"></div>
-        </div>
-      </section>
-
-      <!-- Teacher View -->
-      <section id="teacher-view" class="hidden fade-in">
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="text-xl font-bold text-indigo-700">Teacher's Program</h3>
-          <div class="flex items-center gap-2">
-            <button id="backBtn" class="px-4 py-2 rounded-xl border hover:bg-gray-50">Back</button>
-          </div>
-        </div>
-        <div class="max-w-sm mb-4">
-          <select id="teacherSelector" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-            <option value="">Select a Teacher</option>
-          </select>
-        </div>
-        <div id="teacher-schedule-container" class="overflow-x-auto"></div>
-      </section>
+    <div class="flex justify-center">
+      <button id="generateBtn" class="bg-emerald-500 hover:bg-emerald-600 text-white text-lg font-bold py-3 px-8 rounded-full shadow-lg transform transition-transform duration-200 hover:scale-105">
+        Generate Schedules
+      </button>
     </div>
   </div>
 
-  <!-- Toasts -->
-  <div id="toastWrapper" class="fixed top-4 right-4 z-50 space-y-2"></div>
+  <!-- Schedule View -->
+  <div id="scheduleView" class="container mx-auto hidden fade-in">
+    <div class="flex items-center justify-between mb-6">
+      <button id="backBtn" class="flex items-center text-blue-500 hover:text-blue-700 font-semibold transition-colors duration-200">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+        </svg>
+        Back to Teacher List
+      </button>
 
-  <!-- Overlay Loader -->
-  <div id="overlayLoader" class="fixed inset-0 bg-white/60 backdrop-blur-sm z-40 hidden">
-    <div class="absolute inset-0 flex items-center justify-center">
-      <div class="w-12 h-12 border-4 border-gray-300 rounded-full border-t-transparent animate-spin"></div>
+      <div class="flex-grow flex justify-center mx-4">
+          <select id="teacherSelector" class="form-select block w-full md:w-auto p-2 border-gray-300 rounded-lg shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+            <!-- Options populated by JS -->
+          </select>
+      </div>
+      <div></div> <!-- Spacer -->
+    </div>
+
+    <div id="scheduleTableContainer" class="bg-white shadow-xl rounded-2xl p-4 md:p-6 overflow-x-auto relative">
+      <!-- Schedule table will be inserted here by JavaScript -->
     </div>
   </div>
 
   <!-- Paste Modal -->
-  <div id="pasteModal" class="modal fixed inset-0 flex items-center justify-center bg-black/50 hidden z-50">
-    <div class="bg-white rounded-2xl shadow-xl p-6 w-[95vw] max-w-2xl">
-      <h3 class="text-lg font-bold mb-2">Paste Teacher List</h3>
-      <p class="text-sm text-gray-600 mb-4">One record per line in the format: <span class="font-mono">Teacher Name, Subject, Grade Level, Section</span></p>
-      <textarea id="pasteArea" class="w-full border rounded-lg p-3 h-48" placeholder="e.g.,&#10;Juan Dela Cruz, Mathematics, Grade 7, A&#10;Maria Santos, English, Grade 7, A"></textarea>
-      <div class="flex items-center justify-end gap-3 mt-4">
-        <button id="cancelPasteBtn" class="px-4 py-2 rounded-xl border hover:bg-gray-50">Cancel</button>
-        <button id="applyPasteBtn" class="px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700">Add to Table</button>
+  <div id="pasteModal" class="modal fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden">
+    <div class="bg-white rounded-lg p-6 w-full max-w-xl m-4 shadow-xl">
+      <h3 class="text-xl font-semibold text-slate-800 mb-4">Paste Teacher Data (CSV)</h3>
+      <textarea id="pasteArea" rows="8" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="Paste data here, one teacher per line, e.g., &#10;Joe Bloggs;Math,Science&#10;Jane Doe;English,History,Art"></textarea>
+      <div class="mt-4 flex justify-end space-x-2">
+        <button id="cancelPasteBtn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-full transition-colors duration-200">Cancel</button>
+        <button id="applyPasteBtn" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-full transition-colors duration-200">Apply</button>
       </div>
     </div>
   </div>
 
-  <!-- Message Modal (reused for warnings) -->
-  <div id="messageModal" class="modal fixed inset-0 flex items-center justify-center bg-black/50 hidden z-50">
-    <div class="bg-white rounded-2xl shadow-xl p-6 max-w-sm mx-auto">
-      <h3 id="modalTitle" class="text-lg font-bold mb-2 text-gray-900"></h3>
-      <p id="modalMessage" class="text-sm text-gray-600 mb-6"></p>
-      <div class="flex justify-end gap-2">
-        <button id="closeModalBtn" class="px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700">Close</button>
+  <!-- Message Modal (Toast) -->
+  <div id="messageModal" class="modal fixed inset-0 flex items-end justify-center pointer-events-none hidden">
+    <div id="toast" class="bg-slate-800 text-white py-3 px-6 rounded-lg shadow-lg mb-8 opacity-0 transform translate-y-4 transition-all duration-300 ease-in-out pointer-events-auto">
+      <div id="messageText" class="flex items-center">
+        <svg class="h-5 w-5 mr-2 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <span>Message here.</span>
       </div>
     </div>
   </div>
 
-  <script type="module">
-    // Firebase SDKs
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-    // Canvas-provided globals
-    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-    const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
-    const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-
-    // Initialize Firebase
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const auth = getAuth(app);
-
-    // --- DOM refs ---
-    const setupView = document.getElementById('setup-view');
-    const mainView = document.getElementById('main-view');
-    const teacherView = document.getElementById('teacher-view');
-
-    const programLevelSelect = document.getElementById('programLevel');
-    const sectionsInputContainer = document.getElementById('sections-input-container');
-
-    const teacherTable = document.getElementById('teacherTable');
+  <script>
+    const teachersInput = document.getElementById('teachersInput');
     const teacherTbody = document.getElementById('teacherTbody');
     const addRowBtn = document.getElementById('addRowBtn');
-    const importPasteBtn = document.getElementById('importPasteBtn');
-
-    const teachersInput = document.getElementById('teachersInput'); // hidden textarea (source of truth for save)
-
     const generateBtn = document.getElementById('generateBtn');
-    const exportCsvBtn = document.getElementById('exportCsvBtn');
-    const printBtn = document.getElementById('printBtn');
-    const viewTeacherBtn = document.getElementById('viewTeacherBtn');
-
-    const schoolScheduleContainer = document.getElementById('school-schedule-container');
-    const teacherScheduleContainer = document.getElementById('teacher-schedule-container');
-    const teacherSelector = document.getElementById('teacherSelector');
-
-    const saveParametersBtn = document.getElementById('saveParametersBtn');
-    const proceedBtn = document.getElementById('proceedBtn');
     const backBtn = document.getElementById('backBtn');
-
-    const userIdDisplay = document.getElementById('userIdDisplay');
-
+    const teacherSelector = document.getElementById('teacherSelector');
+    const scheduleTableContainer = document.getElementById('scheduleTableContainer');
+    const mainView = document.getElementById('mainView');
+    const scheduleView = document.getElementById('scheduleView');
+    const importPasteBtn = document.getElementById('importPasteBtn');
     const pasteModal = document.getElementById('pasteModal');
-    const pasteArea = document.getElementById('pasteArea');
     const cancelPasteBtn = document.getElementById('cancelPasteBtn');
     const applyPasteBtn = document.getElementById('applyPasteBtn');
-
+    const pasteArea = document.getElementById('pasteArea');
     const messageModal = document.getElementById('messageModal');
-    const modalTitle = document.getElementById('modalTitle');
-    const modalMessage = document.getElementById('modalMessage');
-    const closeModalBtn = document.getElementById('closeModalBtn');
+    const messageText = document.getElementById('messageText');
+    const toastElement = document.getElementById('toast');
 
-    const overlayLoader = document.getElementById('overlayLoader');
-    const toastWrapper = document.getElementById('toastWrapper');
+    let teachersData = {};
+    let schedule = {};
 
-    const stepper1 = document.getElementById('stepper-1');
-    const stepper2 = document.getElementById('stepper-2');
-
-    // --- App state ---
-    let userId = null;
-    let schoolSchedule = null; // generated schedule object
-    let currentGrades = []; // Grades based on selected program level
-
-    // Constants
-    const subjects = [
-      'Filipino','English','Mathematics','Science','Araling Panlipunan','MAPEH','TLE','Edukasyon sa Pagpapakatao'
-    ];
-    const subjectAbbreviations = { 'Math': 'Mathematics', 'AP': 'Araling Panlipunan', 'EsP': 'Edukasyon sa Pagpapakatao' };
-    const periods = ['Period 1','Period 2','Period 3','Recess','Period 4','Period 5','Lunch','Period 6','Period 7','Period 8'];
-    const gradeNames = ['Kinder','Grade 1','Grade 2','Grade 3','Grade 4','Grade 5','Grade 6','Grade 7','Grade 8','Grade 9','Grade 10','Grade 11','Grade 12'];
-    const programGrades = {
-      elementary: [0, 1, 2, 3, 4, 5, 6],
-      jhs: [7, 8, 9, 10],
-      shs: [11, 12]
-    };
-
-    // --- Utilities ---
-    const showView = (elToShow) => {
-      [setupView, mainView, teacherView].forEach(el => el.classList.add('hidden'));
-      elToShow.classList.remove('hidden');
-      elToShow.classList.add('fade-in');
-      updateStepper();
-    };
-
-    const updateStepper = () => {
-      // Step 1 active if setup visible
-      const step1Active = !setupView.classList.contains('hidden');
-      stepper1.querySelector('span').className = `flex items-center justify-center w-8 h-8 mr-2 text-sm font-medium rounded-full ${step1Active ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-700'}`;
-      stepper2.querySelector('span').className = `flex items-center justify-center w-8 h-8 mr-2 text-sm font-medium rounded-full ${mainView.classList.contains('hidden') && teacherView.classList.contains('hidden') ? 'bg-gray-200 text-gray-700' : 'bg-indigo-600 text-white'}`;
-    };
-
-    const toast = (msg, type = 'info') => {
-      const colors = {
-        info: 'bg-white border-blue-200',
-        success: 'bg-white border-green-200',
-        warning: 'bg-white border-yellow-200',
-        error: 'bg-white border-red-200'
+    function toast(message, type = 'success') {
+      const icons = {
+        success: `<svg class="h-5 w-5 mr-2 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`,
+        warning: `<svg class="h-5 w-5 mr-2 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856a2 2 0 001.905-2.738L13.916 4.262a2 2 0 00-3.832 0l-7.07 13.04a2 2 0 001.906 2.738z" /></svg>`,
+        error: `<svg class="h-5 w-5 mr-2 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`
       };
-      const el = document.createElement('div');
-      el.className = `border ${colors[type]} shadow-sm rounded-xl px-4 py-3 text-sm text-gray-800 flex items-start gap-3`;
-      el.innerHTML = `<div class="mt-0.5">${msg}</div>`;
-      toastWrapper.appendChild(el);
-      setTimeout(() => { el.classList.add('opacity-0'); el.style.transition='opacity .3s'; setTimeout(()=>el.remove(), 300); }, 2800);
-    };
-
-    const showMessageModal = (title, message) => { modalTitle.textContent = title; modalMessage.textContent = message; messageModal.classList.remove('hidden'); messageModal.classList.add('visible'); };
-    const hideMessageModal = () => { messageModal.classList.remove('visible'); messageModal.classList.add('hidden'); };
-
-    const showLoader = () => overlayLoader.classList.remove('hidden');
-    const hideLoader = () => overlayLoader.classList.add('hidden');
-
-    const shuffleArray = (array) => { const a=[...array]; for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a; };
-
-    // Sections inputs
-    function generateSectionsInputs() {
-      sectionsInputContainer.innerHTML = '';
-      currentGrades = programGrades[programLevelSelect.value];
-      currentGrades.forEach(gradeIdx => {
-        const wrapper = document.createElement('div');
-        wrapper.className = 'w-full';
-        wrapper.innerHTML = `
-          <label class="block text-gray-700 text-sm font-semibold mb-1">Sections for ${gradeNames[gradeIdx]}</label>
-          <input type="number" min="1" value="1" data-grade="${gradeIdx}" class="section-count w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" />`;
-        sectionsInputContainer.appendChild(wrapper);
-      });
+      messageText.innerHTML = icons[type] + `<span>${message}</span>`;
+      toastElement.style.backgroundColor = type === 'success' ? '#16a34a' : type === 'warning' ? '#f59e0b' : '#ef4444';
+      messageModal.classList.remove('hidden');
+      toastElement.classList.add('opacity-100', 'translate-y-0');
+      setTimeout(() => {
+        toastElement.classList.remove('opacity-100', 'translate-y-0');
+        toastElement.classList.add('opacity-0', 'translate-y-4');
+        setTimeout(() => messageModal.classList.add('hidden'), 300);
+      }, 3000);
     }
 
-    function getSectionsConfig() {
-      const config = {};
-      const inputs = sectionsInputContainer.querySelectorAll('.section-count');
-      inputs.forEach(input => {
-        const grade = input.getAttribute('data-grade');
-        const sections = Math.max(1, parseInt(input.value) || 1);
-        config[grade] = sections;
-      });
-      return config;
-    }
-
-    function setSectionsInputs(config) {
-        if (!config) return;
-        const inputs = sectionsInputContainer.querySelectorAll('.section-count');
-        inputs.forEach(input => {
-            const grade = input.getAttribute('data-grade');
-            if (config[grade]) {
-                input.value = config[grade];
-            }
-        });
-    }
-
-    // Teacher table helpers
-    function makeSubjectSelect(value = '') {
-      const sel = document.createElement('select');
-      sel.className = 'w-full border rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500';
-      sel.innerHTML = `<option value="">Select</option>` + subjects.map(s=>`<option ${s===value?'selected':''}>${s}</option>`).join('');
-      return sel;
-    }
-    function makeGradeSelect(value = '') {
-      const sel = document.createElement('select');
-      sel.className = 'w-full border rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500';
-      const gradeOptions = currentGrades.map(gradeIdx => `<option value="${gradeIdx}" ${String(gradeIdx) === String(value) ? 'selected' : ''}>${gradeNames[gradeIdx]}</option>`).join('');
-      sel.innerHTML = `<option value="">Select</option>` + gradeOptions;
-      return sel;
-    }
-    function addTeacherRow({name='', subject='', grade='', section=''}={}) {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td class="p-2"><input type="text" class="w-full border rounded-lg px-2 py-1.5" placeholder="Teacher name" value="${name}"></td>
-        <td class="p-2"></td>
-        <td class="p-2"></td>
-        <td class="p-2"><input type="text" class="w-full border rounded-lg px-2 py-1.5" placeholder="Section (e.g., A)" value="${section}"></td>
-        <td class="p-2 text-center"><button class="text-red-600 hover:underline remove-row">Remove</button></td>`;
-      const subjectCell = tr.children[1];
-      const gradeCell = tr.children[2];
-      subjectCell.appendChild(makeSubjectSelect(subject));
-      gradeCell.appendChild(makeGradeSelect(grade));
-      teacherTbody.appendChild(tr);
-    }
-
-    function tableToTextarea() {
-      const rows = [...teacherTbody.querySelectorAll('tr')];
-      const lines = rows.map(tr => {
-        const name = tr.children[0].querySelector('input').value.trim();
-        const subject = tr.children[1].querySelector('select').value.trim();
-        const gradeIdx = tr.children[2].querySelector('select').value;
-        const section = tr.children[3].querySelector('input').value.trim();
-        if (!name && !subject && !gradeIdx && !section) return '';
-        const gradeLabel = gradeIdx===''?'' : (gradeIdx==0 ? 'Kinder' : 'Grade '+gradeIdx);
-        return `${name}, ${subject}, ${gradeLabel}, ${section}`;
+    function generateSchedule() {
+      schedule = {};
+      const teachers = teachersInput.value.split('\n').filter(Boolean).map(line => {
+        const [name, subjectsString] = line.split(';');
+        if (!name || !subjectsString) return null;
+        return { name: name.trim(), subjects: subjectsString.split(',').map(s => s.trim()) };
       }).filter(Boolean);
-      teachersInput.value = lines.join('\n');
-    }
 
-    function textareaToTable() {
-      teacherTbody.innerHTML='';
-      const lines = teachersInput.value.trim().split('\n').filter(l=>l.trim()!=='' && !l.trim().startsWith('//'));
-      lines.forEach(line => {
-        const parts = line.split(',').map(p=>p.trim());
-        const [name, subjRaw, gradeRaw, section] = [parts[0]||'', parts[1]||'', parts[2]||'', parts[3]||''];
-        const subject = subjectAbbreviations[subjRaw] || subjRaw;
-        let gradeIdx = '';
-        if (/^kinder$/i.test(gradeRaw)) gradeIdx = 0; else {
-          const m = gradeRaw.match(/(\d+)/); gradeIdx = m? Number(m[1]) : '';
-        }
-        addTeacherRow({ name, subject, grade: gradeIdx, section });
-      });
-    }
+      teachersData = teachers.reduce((acc, t) => {
+        acc[t.name] = t.subjects;
+        return acc;
+      }, {});
 
-    // Parse teachers (re-uses original format)
-    function parseTeachers() {
-      tableToTextarea();
-      const lines = teachersInput.value.trim().split('\n').filter(l=>l.trim()!=='' && !l.trim().startsWith('//'));
-      const teachers = []; const invalidLines = [];
-      lines.forEach((line, index) => {
-        const parts = line.split(',').map(part => part.trim());
-        if (parts.length === 4) {
-          const gradeString = parts[2].replace(/Grade\s*/, '');
-          const gradeNumber = gradeString.toLowerCase() === 'kinder' ? 0 : parseInt(gradeString);
-          const subjectName = subjectAbbreviations[parts[1]] || parts[1];
-          if (subjects.includes(subjectName) && !isNaN(gradeNumber) && parts[3]) {
-            teachers.push({ name: parts[0], subject: subjectName, grade: gradeNumber, section: parts[3] });
-          } else { invalidLines.push(`Line ${index + 1}: "${line}" - Invalid subject, grade, or section.`); }
-        } else { invalidLines.push(`Line ${index + 1}: "${line}" - Expected 4 comma-separated values.`); }
-      });
-      return { teachers, invalidLines };
-    }
-
-    // Firestore helpers
-    async function saveParametersToFirestore(programLevel, sectionsConfig) {
-      if (!userId) { console.warn('Cannot save parameters: User not authenticated.'); return; }
-      try {
-        const paramsRef = doc(db, `artifacts/${appId}/users/${userId}/data/school-parameters`);
-        await setDoc(paramsRef, { programLevel, sectionsConfig, timestamp: new Date() });
-        toast('School parameters saved.', 'success');
-      } catch (e) { console.error(e); toast('Failed to save parameters.', 'error'); }
-    }
-
-    async function saveScheduleToFirestore(teachersData) {
-      if (!userId) { console.warn('Cannot save schedule: User not authenticated.'); return; }
-      try {
-        const scheduleRef = doc(db, `artifacts/${appId}/users/${userId}/data/schedule-data`);
-        await setDoc(scheduleRef, { teachersInput: teachersData, timestamp: new Date() });
-        toast('Teacher data saved.', 'success');
-      } catch (e) { console.error(e); toast('Failed to save teacher data.', 'error'); }
-    }
-    
-    async function loadDataFromFirestore() {
-      if (!userId) return;
-      try {
-        // Load school parameters first
-        const paramsRef = doc(db, `artifacts/${appId}/users/${userId}/data/school-parameters`);
-        const paramsSnap = await getDoc(paramsRef);
-        if (paramsSnap.exists()) {
-          const paramsData = paramsSnap.data();
-          programLevelSelect.value = paramsData.programLevel;
-          generateSectionsInputs(); // Generate inputs for the loaded program level
-          setSectionsInputs(paramsData.sectionsConfig); // Set the values from saved data
-          showView(mainView); // Jump to main view if parameters exist
-        } else {
-          // Set a default and generate inputs if no data exists
-          programLevelSelect.value = 'jhs';
-          generateSectionsInputs();
-          showView(setupView);
-        }
-        
-        // Then load teacher data if a schedule exists
-        const scheduleRef = doc(db, `artifacts/${appId}/users/${userId}/data/schedule-data`);
-        const scheduleSnap = await getDoc(scheduleRef);
-        if (scheduleSnap.exists()) {
-          const data = scheduleSnap.data();
-          teachersInput.value = data.teachersInput || '';
-          textareaToTable();
-        } else {
-          // If no teacher data, ensure the table is empty
-          teachersInput.value = '';
-          textareaToTable();
-        }
-
-        // Generate schedule if we have teacher data
-        if (teachersInput.value) {
-            generateAndRenderSchoolSchedule();
-        }
-
-      } catch (e) {
-        console.error(e);
-        // Default to setup view if there's any error loading from Firestore
-        programLevelSelect.value = 'jhs';
-        generateSectionsInputs();
-        showView(setupView);
-      }
-    }
-
-    // Schedule generation
-    function generateAndRenderSchoolSchedule() {
-      schoolScheduleContainer.innerHTML = '';
-      const { teachers, invalidLines } = parseTeachers();
-      if (invalidLines.length) {
-        schoolScheduleContainer.innerHTML = `
-          <div class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-xl mb-4">
-            <div class="font-semibold">Invalid Teacher Data</div>
-            <ul class="list-disc ml-5 mt-1 text-sm">${invalidLines.map(l=>`<li>${l}</li>`).join('')}</ul>
-          </div>`;
-        return;
-      }
-      if (!teachers.length) {
-        schoolScheduleContainer.innerHTML = '<p class="text-center text-red-500 font-semibold">Please enter valid teacher data to generate a schedule.</p>';
+      if (teachers.length === 0) {
+        toast('Please add at least one teacher.', 'warning');
         return;
       }
 
-      // Build class assignments map
-      const classAssignments = new Map();
-      teachers.forEach(t => {
-        const classKey = `${gradeNames[t.grade]}-${t.section}`;
-        if (!classAssignments.has(classKey)) classAssignments.set(classKey, []);
-        classAssignments.get(classKey).push({ subject: t.subject, teacher: t.name });
-      });
+      const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+      const periods = Array.from({ length: 8 }, (_, i) => `P${i + 1}`);
 
-      const allSchedules = {}; // { classKey: { periodName: {subject, teacher} } }
-      const periodAvailability = new Map(); // period -> Set(teacher)
-      periods.forEach(p => periodAvailability.set(p, new Set()));
+      for (const teacher of teachers) {
+        schedule[teacher.name] = {};
+        for (const day of days) {
+          schedule[teacher.name][day] = {};
+          const assignedPeriods = new Set();
+          const subjects = [...teacher.subjects];
+          let subjectIndex = 0;
 
-      const classKeys = [...classAssignments.keys()].sort();
-
-      classKeys.forEach(classKey => {
-        allSchedules[classKey] = {};
-        const assignments = shuffleArray(classAssignments.get(classKey));
-        let idx = 0;
-        periods.forEach(period => {
-          if (period === 'Recess' || period === 'Lunch') { allSchedules[classKey][period] = { subject: period.toUpperCase(), teacher: '' }; return; }
-          let assigned = false, attempts = 0, max = assignments.length;
-          while (!assigned && attempts < max) {
-            const current = assignments[idx];
-            const busy = periodAvailability.get(period);
-            if (!busy.has(current.teacher)) {
-              allSchedules[classKey][period] = { ...current };
-              busy.add(current.teacher);
-              const moved = assignments.splice(idx, 1)[0]; assignments.push(moved); idx = 0; assigned = true;
-            } else { idx = (idx + 1) % assignments.length; attempts++; }
+          // Simple assignment: distribute subjects across periods
+          for (const period of periods) {
+            if (subjectIndex < subjects.length) {
+              schedule[teacher.name][day][period] = subjects[subjectIndex];
+              subjectIndex++;
+            } else {
+              schedule[teacher.name][day][period] = 'Free';
+            }
           }
-          if (!assigned) allSchedules[classKey][period] = { subject: 'Unassigned', teacher: 'N/A' };
-        });
-      });
-
-      schoolSchedule = allSchedules;
-
-      // Render table
-      const table = document.createElement('table');
-      table.className = 'min-w-full bg-white rounded-xl overflow-hidden shadow border';
-      const thead = document.createElement('thead');
-      thead.className = 'bg-indigo-600 text-white text-xs uppercase tracking-wide';
-      const headRow = document.createElement('tr');
-      headRow.innerHTML = `<th class="py-3 px-4 text-left sticky-col">Period</th>` +
-        [...classKeys].map(c=>`<th class="py-3 px-4 text-center">${c}</th>`).join('');
-      thead.appendChild(headRow);
-
-      const tbody = document.createElement('tbody');
-      tbody.className = 'text-gray-700 text-sm';
-
-      periods.forEach((period, i) => {
-        const tr = document.createElement('tr');
-        tr.className = i % 2 === 0 ? 'bg-gray-50' : 'bg-white';
-        // sticky first col
-        const tdLabel = document.createElement('td');
-        tdLabel.className = 'py-3 px-4 font-medium sticky-col';
-        tdLabel.textContent = period;
-        tr.appendChild(tdLabel);
-
-        classKeys.forEach(classKey => {
-          const a = allSchedules[classKey][period];
-          const td = document.createElement('td');
-          td.className = 'py-3 px-4 text-center';
-          if (period === 'Recess' || period === 'Lunch') {
-            td.innerHTML = `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-200 text-gray-700">${period.toUpperCase()}</span>`;
-          } else {
-            const teacherTitle = a?.teacher && a.teacher !== 'N/A' ? `title="${a.teacher}"` : '';
-            td.innerHTML = `
-              <div class="font-semibold">${a?.subject || 'N/A'}</div>
-              <div class="text-xs text-gray-500" ${teacherTitle}>${a?.teacher || 'N/A'}</div>`;
-            if (a?.subject === 'Unassigned') td.classList.add('bg-yellow-50');
-          }
-          tr.appendChild(td);
-        });
-        tbody.appendChild(tr);
-      });
-
-      table.appendChild(thead); table.appendChild(tbody);
-      schoolScheduleContainer.appendChild(table);
-
-      const unassignedCount = Object.values(allSchedules).flatMap(Object.values).filter(a=>a.subject==='Unassigned').length;
-      if (unassignedCount>0) {
-        const warn = document.createElement('div');
-        warn.className = 'mt-3 bg-yellow-50 border border-yellow-200 text-yellow-900 px-4 py-3 rounded-xl';
-        warn.innerHTML = `<strong>Heads up:</strong> A full schedule could not be generated. Ensure enough unique subject–teacher assignments to cover all periods.`;
-        schoolScheduleContainer.prepend(warn);
+        }
       }
 
-      populateTeacherSelector(teachers);
-      saveScheduleToFirestore(teachersInput.value);
+      displayTeacherSelector(Object.keys(teachersData));
+      showScheduleView();
+      displaySelectedTeacherSchedule(Object.keys(teachersData)[0]);
+      toast('Schedule generated successfully.', 'success');
     }
 
-    function populateTeacherSelector(teachers) {
-      teacherSelector.innerHTML = '<option value="">Select a Teacher</option>';
-      [...new Set(teachers.map(t=>t.name))].sort().forEach(name => {
-        const opt = document.createElement('option'); opt.value = name; opt.textContent = name; teacherSelector.appendChild(opt);
+    function displayTeacherSelector(teacherNames) {
+      teacherSelector.innerHTML = '';
+      teacherNames.forEach(name => {
+        const option = document.createElement('option');
+        option.value = name;
+        option.textContent = name;
+        teacherSelector.appendChild(option);
       });
     }
 
     function displaySelectedTeacherSchedule(teacherName) {
-      showView(teacherView);
-      teacherScheduleContainer.innerHTML='';
-      const teacherProgram = {}; periods.forEach(p=>teacherProgram[p] = { subject: 'FREE PERIOD', grade: '', section: '' });
-      if (schoolSchedule) {
-        for (const classKey in schoolSchedule) {
-          for (const periodName in schoolSchedule[classKey]) {
-            if (schoolSchedule[classKey][periodName].teacher === teacherName) {
-              const [grade, section] = classKey.split('-');
-              teacherProgram[periodName] = { subject: schoolSchedule[classKey][periodName].subject, grade, section };
-            }
-          }
-        }
-      }
-      // Render
-      const table = document.createElement('table');
-      table.className = 'min-w-full bg-white rounded-xl overflow-hidden shadow border';
-      const thead = document.createElement('thead');
-      thead.className = 'bg-indigo-600 text-white text-xs uppercase tracking-wide';
-      thead.innerHTML = `<tr><th class="py-3 px-4 text-left">Period</th><th class="py-3 px-4 text-center">Subject</th><th class="py-3 px-4 text-center">Grade & Section</th></tr>`;
-      const tbody = document.createElement('tbody'); tbody.className = 'text-gray-700 text-sm';
-      periods.forEach((period, i)=>{
-        const a = teacherProgram[period];
-        const tr = document.createElement('tr'); tr.className = i%2===0?'bg-gray-50':'bg-white';
-        if (period==='Recess' || period==='Lunch') {
-          tr.innerHTML = `<td colspan="3" class="py-3 px-4 text-center bg-gray-100 font-semibold">${period.toUpperCase()}</td>`;
-        } else {
-          tr.innerHTML = `<td class="py-3 px-4 font-medium">${period}</td><td class="py-3 px-4 text-center">${a.subject}</td><td class="py-3 px-4 text-center">${a.grade ? `${a.grade}-${a.section}` : ''}</td>`;
-        }
-        tbody.appendChild(tr);
-      });
-      table.appendChild(thead); table.appendChild(tbody); teacherScheduleContainer.appendChild(table);
+      const currentSchedule = schedule[teacherName];
+      if (!currentSchedule) return;
+
+      const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+      const periods = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7', 'P8'];
+
+      let tableHtml = `
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="sticky-col px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Period</th>
+              ${days.map(day => `<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">${day}</th>`).join('')}
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            ${periods.map(period => `
+              <tr>
+                <td class="sticky-col px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${period}</td>
+                ${days.map(day => `
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${currentSchedule[day][period] || ''}</td>
+                `).join('')}
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+      scheduleTableContainer.innerHTML = tableHtml;
     }
 
-    function backToMainView() { showView(mainView); teacherSelector.value=''; teacherScheduleContainer.innerHTML=''; }
-
-    // CSV export (simple)
-    function exportScheduleCSV() {
-      if (!schoolSchedule) { toast('Generate a schedule first.', 'warning'); return; }
-      const classKeys = Object.keys(schoolSchedule);
-      const header = ['Period', ...classKeys];
-      const rows = [header];
-      periods.forEach(period => {
-        const row = [period];
-        classKeys.forEach(k => {
-          const a = schoolSchedule[k][period];
-          row.push(period==='Recess'||period==='Lunch' ? period.toUpperCase() : `${a.subject} — ${a.teacher}`);
-        });
-        rows.push(row);
+    function tableToTextarea() {
+      const rows = teacherTbody.querySelectorAll('tr');
+      let data = [];
+      rows.forEach(row => {
+        const name = row.querySelector('.teacher-name').value;
+        const subjects = row.querySelector('.teacher-subjects').value;
+        if (name && subjects) {
+          data.push(`${name};${subjects}`);
+        }
       });
-      const csv = rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url; a.download = 'school_schedule.csv'; a.click(); URL.revokeObjectURL(url);
+      teachersInput.value = data.join('\n');
     }
 
-    // Auth flow
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        userId = user.uid;
-      } else {
-        try { if (initialAuthToken) { await signInWithCustomToken(auth, initialAuthToken);} else { await signInAnonymously(auth);} }
-        catch (e) { console.error('Firebase auth failed:', e); }
+    function textareaToTable() {
+      teacherTbody.innerHTML = '';
+      const teachers = teachersInput.value.split('\n').filter(Boolean);
+      teachers.forEach(line => {
+        const [name, subjects] = line.split(';');
+        if (name && subjects) {
+          addTeacherRow(name, subjects);
+        }
+      });
+      if (teachers.length === 0) {
+        addTeacherRow();
       }
-      if (auth.currentUser) {
-        userId = auth.currentUser.uid;
-        userIdDisplay.textContent = `User ID: ${userId}`;
-        await loadDataFromFirestore();
-      } else {
-        userIdDisplay.textContent = 'User ID: Not authenticated';
-        programLevelSelect.value = 'jhs'; // Set a default value
-        generateSectionsInputs();
-        showView(setupView);
-      }
-    });
+    }
+
+    function addTeacherRow(name = '', subjects = '') {
+      const newRow = document.createElement('tr');
+      newRow.innerHTML = `
+        <td class="px-6 py-4 whitespace-nowrap">
+          <input type="text" class="teacher-name w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="Teacher Name" value="${name}">
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap">
+          <input type="text" class="teacher-subjects w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="Subject1, Subject2" value="${subjects}">
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+          <button class="remove-row text-red-600 hover:text-red-900 font-semibold transition-colors duration-200">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.214 21H7.786A2 2 0 015.867 19.142L5 7m4 6h.01M15 6.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
+              </svg>
+          </button>
+        </td>
+      `;
+      teacherTbody.appendChild(newRow);
+      tableToTextarea();
+    }
+
+    function showMainView() {
+      scheduleView.classList.add('hidden');
+      scheduleView.classList.remove('fade-in');
+      mainView.classList.remove('hidden');
+      mainView.classList.add('fade-in');
+    }
+
+    function showScheduleView() {
+      mainView.classList.add('hidden');
+      mainView.classList.remove('fade-in');
+      scheduleView.classList.remove('hidden');
+      scheduleView.classList.add('fade-in');
+    }
+
+    function backToMainView() {
+      showMainView();
+      // On back, refresh the table from the textarea
+      textareaToTable();
+    }
 
     // Event listeners
-    programLevelSelect.addEventListener('change', generateSectionsInputs);
-
-    saveParametersBtn.addEventListener('click', async () => {
-      const sectionsConfig = getSectionsConfig();
-      await saveParametersToFirestore(programLevelSelect.value, sectionsConfig);
-    });
-
-    proceedBtn.addEventListener('click', async () => {
-      const sectionsConfig = getSectionsConfig();
-      await saveParametersToFirestore(programLevelSelect.value, sectionsConfig);
-
-      let placeholderLines = [];
-      for (const grade in sectionsConfig) {
-        const count = sectionsConfig[grade];
-        for (let j=1;j<=count;j++) {
-          const letter = String.fromCharCode('A'.charCodeAt(0) + j - 1);
-          placeholderLines.push(`// Enter teachers for ${gradeNames[grade]}, Section ${letter}`);
-        }
-      }
-      teachersInput.value = placeholderLines.join('\n');
+    window.onload = () => {
+      // Initialize with one empty row
       textareaToTable();
-      showView(mainView);
-      toast('Now add teacher assignments, then click Generate.', 'info');
-    });
+    };
 
-    generateBtn.addEventListener('click', async () => {
-      showLoader();
-      try { generateAndRenderSchoolSchedule(); }
-      finally { hideLoader(); }
-    });
-
-    exportCsvBtn.addEventListener('click', exportScheduleCSV);
-    printBtn.addEventListener('click', () => window.print());
-
-    viewTeacherBtn.addEventListener('click', () => {
-      if (!schoolSchedule) { toast('Generate a schedule first.', 'warning'); return; }
-      const { teachers } = parseTeachers();
-      populateTeacherSelector(teachers);
-      showView(teacherView);
-    });
-
+    generateBtn.addEventListener('click', generateSchedule);
     teacherSelector.addEventListener('change', (e) => { const v = e.target.value; if (v) displaySelectedTeacherSchedule(v); });
     backBtn.addEventListener('click', backToMainView);
 
     // Teacher table actions
     addRowBtn.addEventListener('click', () => addTeacherRow());
-    teacherTbody.addEventListener('click', (e) => { if (e.target.closest('.remove-row')) { e.target.closest('tr').remove(); tableToTextarea(); } });
+    teacherTbody.addEventListener('click', (e) => {
+      if (e.target.closest('.remove-row')) {
+        e.target.closest('tr').remove();
+        tableToTextarea();
+      }
+    });
     teacherTbody.addEventListener('change', tableToTextarea);
     teacherTbody.addEventListener('input', tableToTextarea);
 
     // Paste modal
-    importPasteBtn.addEventListener('click', ()=>{ pasteArea.value=''; pasteModal.classList.remove('hidden'); pasteModal.classList.add('visible'); });
-    cancelPasteBtn.addEventListener('click', ()=>{ pasteModal.classList.remove('visible'); pasteModal.classList.add('hidden'); });
-    applyPasteBtn.addEventListener('click', ()=>{
+    importPasteBtn.addEventListener('click', () => { pasteArea.value = ''; pasteModal.classList.remove('hidden'); pasteModal.classList.add('visible'); });
+    cancelPasteBtn.addEventListener('click', () => { pasteModal.classList.remove('visible'); pasteModal.classList.add('hidden'); });
+    applyPasteBtn.addEventListener('click', () => {
       const lines = pasteArea.value.split('\n').filter(Boolean);
       if (!lines.length) { toast('Nothing to add.', 'warning'); return; }
-      lines.forEach(l=>{ teachersInput.value += (teachersInput.value? '\n':'') + l; });
+      lines.forEach(l => { teachersInput.value += (teachersInput.value ? '\n' : '') + l; });
       textareaToTable();
       toast('Pasted rows added.', 'success');
       pasteModal.classList.remove('visible'); pasteModal.classList.add('hidden');
     });
 
-    // Message modal close
-    closeModalBtn.addEventListener('click', hideMessageModal);
   </script>
 </body>
 </html>
