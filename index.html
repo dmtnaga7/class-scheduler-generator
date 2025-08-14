@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DepEd Class Schedule Generator</title>
+  <title>NAGA Scheduler</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
   <style>
-    :root { color-scheme: light; }\
+    :root { color-scheme: light; }
     body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
     .modal { transition: opacity .3s ease-in-out, visibility .3s ease-in-out; }
     .modal.hidden { opacity: 0; visibility: hidden; }
@@ -21,6 +21,14 @@
     /* Simple fade for views */
     .fade-in { animation: fade .25s ease-out both; }
     @keyframes fade { from { opacity: .0; transform: translateY(4px);} to { opacity: 1; transform: translateY(0);} }
+
+    /* Custom colors from the logo */
+    .bg-naga-green-dark { background-color: #11613A; }
+    .text-naga-green-dark { color: #11613A; }
+    .bg-naga-green-light { background-color: #4C9B47; }
+    .bg-naga-yellow { background-color: #F8D919; }
+    .bg-naga-red { background-color: #E23136; }
+    .bg-naga-blue { background-color: #2F518B; }
   </style>
 </head>
 <body class="bg-gray-100 min-h-screen">
@@ -28,12 +36,13 @@
     <!-- Header -->
     <header class="bg-white shadow-sm rounded-2xl px-6 py-4 mb-6 flex items-center justify-between">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-indigo-600/10 flex items-center justify-center">
-          <span class="text-xl font-bold text-indigo-700">DG</span>
+        <div class="w-12 h-12">
+          <!-- Logo image added here -->
+          <img src="uploaded:City of Naga Division LOGO.jpg-a7241507-2079-41b7-82ac-566ed7e6b1a8" alt="City of Naga Division LOGO" class="w-full h-full object-contain">
         </div>
         <div>
-          <h1 class="text-2xl md:text-3xl font-extrabold text-indigo-800">DepEd Class Schedule Generator</h1>
-          <p class="text-sm text-gray-500">Generate daily schedules from teacher assignments</p>
+          <h1 class="text-2xl md:text-3xl font-extrabold text-naga-green-dark">NAGA Scheduler</h1>
+          <p class="text-sm text-gray-500">Next-gen Approach to Generating Academic Schedules</p>
         </div>
       </div>
     </header>
@@ -42,7 +51,7 @@
     <div class="bg-white rounded-2xl shadow-sm p-4 md:p-6 mb-6">
       <ol class="flex items-center w-full">
         <li class="flex items-center w-1/2" id="stepper-1">
-          <span class="flex items-center justify-center w-8 h-8 mr-2 text-sm font-medium rounded-full bg-indigo-600 text-white">1</span>
+          <span class="flex items-center justify-center w-8 h-8 mr-2 text-sm font-medium rounded-full bg-naga-green-dark text-white">1</span>
           <span class="text-sm md:text-base font-medium">Set School Parameters</span>
           <span class="flex-auto border-t ml-2 border-gray-200"></span>
         </li>
@@ -57,11 +66,11 @@
     <div class="bg-white rounded-2xl shadow-md p-4 md:p-6">
       <!-- Setup View: Select Program Level -->
       <section id="setup-view" class="fade-in">
-        <h2 class="text-xl font-bold text-indigo-700 mb-4">Set School Parameters</h2>
+        <h2 class="text-xl font-bold text-naga-green-dark mb-4">Set School Parameters</h2>
         <div class="grid md:grid-cols-2 items-end gap-4">
           <div>
             <label for="programLevel" class="block text-gray-700 text-sm font-semibold mb-1">Select Program Level</label>
-            <select id="programLevel" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <select id="programLevel" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-naga-green-dark">
               <option value="" disabled selected>Choose a Program Level</option>
               <option value="elementary">Elementary (Kinder - Grade 6)</option>
               <option value="jhs">Junior High School (Grades 7 - 10)</option>
@@ -71,27 +80,28 @@
         </div>
 
         <div class="mt-8 pt-6 border-t">
-          <h3 class="text-lg font-bold text-indigo-700 mb-4">Daily Schedule Periods</h3>
+          <h3 class="text-lg font-bold text-naga-green-dark mb-4">Daily Schedule Periods</h3>
           <p class="text-sm text-gray-500 mb-4">Enter the time duration for each period. Recess and Lunch are fixed breaks.</p>
-          <div id="time-duration-container" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-4"></div>
+          <!-- MODIFICATION: New layout for time duration inputs -->
+          <div id="time-duration-container" class="flex flex-col md:flex-row gap-4"></div>
         </div>
 
         <div class="flex items-center justify-end gap-3 mt-6">
-          <button id="proceedToSectionsBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-5 py-3 rounded-xl shadow">Continue</button>
+          <button id="proceedToSectionsBtn" class="bg-naga-green-dark hover:bg-naga-green-light text-white font-semibold px-5 py-3 rounded-xl shadow">Continue</button>
         </div>
       </section>
 
       <!-- Sections View: Specify sections per grade -->
       <section id="sections-view" class="hidden fade-in">
         <div class="flex items-center justify-between mb-4">
-          <h2 class="text-xl font-bold text-indigo-700">Sections per Grade</h2>
+          <h2 class="text-xl font-bold text-naga-green-dark">Sections per Grade</h2>
           <button id="backToSetupBtn" class="px-4 py-2 rounded-xl border hover:bg-gray-50">Back</button>
         </div>
         <p class="text-sm text-gray-500 mb-4">Specify how many sections each grade level has. Letters (A, B, C…) will be auto-assigned.</p>
         <div id="sections-input-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
 
         <div class="flex items-center justify-end gap-3 mt-6">
-          <button id="proceedToMainBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-5 py-3 rounded-xl shadow">Continue to Teacher Assignments</button>
+          <button id="proceedToMainBtn" class="bg-naga-green-dark hover:bg-naga-green-light text-white font-semibold px-5 py-3 rounded-xl shadow">Continue to Teacher Assignments</button>
         </div>
       </section>
 
@@ -101,11 +111,11 @@
         <textarea id="teachersInput" rows="8" class="sr-only"></textarea>
 
         <div class="flex items-center justify-between gap-3 mb-4">
-          <h2 class="text-xl font-bold text-indigo-700">Teacher Assignments</h2>
+          <h2 class="text-xl font-bold text-naga-green-dark">Teacher Assignments</h2>
           <div class="flex items-center gap-2">
             <button id="backToSetupFromMainBtn" class="px-3 py-2 rounded-lg border hover:bg-gray-50">Back to Setup</button>
             <button id="importPasteBtn" class="px-3 py-2 rounded-lg border hover:bg-gray-50">Paste List</button>
-            <button id="addRowBtn" class="px-3 py-2 rounded-lg bg-gray-800 text-white hover:bg-black">Add Row</button>
+            <button id="addRowBtn" class="px-3 py-2 rounded-lg bg-naga-green-dark text-white hover:bg-naga-green-light">Add Row</button>
           </div>
         </div>
 
@@ -128,47 +138,77 @@
         <div class="flex flex-wrap items-center gap-3 mt-6">
           <button id="generateBtn" class="bg-gray-400 text-white font-bold px-5 py-3 rounded-xl shadow cursor-not-allowed">Generate Schedules</button>
         </div>
+      </section>
 
-        <!-- Schedule tabs and content -->
-        <div id="schedule-display" class="hidden fade-in mt-8">
-            <div role="tablist" class="flex flex-col sm:flex-row gap-2 mb-4">
-                <button role="tab" id="tab-school" class="tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-indigo-600 text-white">School-wide Schedule</button>
-                <button role="tab" id="tab-teacher" class="tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-200 text-gray-700">Teacher's Program</button>
-                <button role="tab" id="tab-class" class="tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-200 text-gray-700">Class Program</button>
-            </div>
-
-            <div id="school-schedule-container" class="tab-content">
-                <div class="flex justify-end mb-4">
-                    <button id="export-school-btn" class="px-4 py-2 rounded-xl border hover:bg-gray-50 text-sm">Export to CSV</button>
-                </div>
-            </div>
-
-            <div id="teacher-program-container" class="tab-content hidden">
-              <div class="flex justify-between items-center mb-4">
-                <div class="max-w-sm w-full">
-                  <label for="teacherSelector" class="block text-gray-700 text-sm font-semibold mb-1">Select a Teacher</label>
-                  <select id="teacherSelector" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    <option value="">Select a Teacher</option>
-                  </select>
-                </div>
-                <button id="export-teacher-btn" class="px-4 py-2 rounded-xl border hover:bg-gray-50 text-sm">Export to CSV</button>
-              </div>
-              <div id="teacher-schedule-container" class="overflow-x-auto"></div>
-            </div>
-
-            <div id="class-program-container" class="tab-content hidden">
-              <div class="flex justify-between items-center mb-4">
-                <div class="max-w-sm w-full">
-                  <label for="classSelector" class="block text-gray-700 text-sm font-semibold mb-1">Select a Class</label>
-                  <select id="classSelector" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    <option value="">Select a Class</option>
-                  </select>
-                </div>
-                <button id="export-class-btn" class="px-4 py-2 rounded-xl border hover:bg-gray-50 text-sm">Export to CSV</button>
-              </div>
-              <div id="class-schedule-container" class="overflow-x-auto"></div>
-            </div>
+      <!-- Schedule Navigation View -->
+      <section id="schedule-nav-view" class="hidden fade-in">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-xl font-bold text-naga-green-dark">Generated Schedules</h2>
+          <button id="backToMainFromNavBtn" class="px-4 py-2 rounded-xl border hover:bg-gray-50">Back to Assignments</button>
         </div>
+        <p class="text-sm text-gray-500 mb-6">Select a schedule type to view its details.</p>
+        <div class="grid md:grid-cols-3 gap-6">
+          <button id="viewSchoolScheduleBtn" class="p-6 bg-naga-green-dark text-white rounded-2xl shadow-lg hover:bg-naga-green-light transition-all">
+            <h3 class="text-lg font-bold">School-wide Schedule</h3>
+            <p class="text-sm mt-1">View the overall schedule for all classes.</p>
+          </button>
+          <button id="viewTeacherProgramBtn" class="p-6 bg-naga-green-dark text-white rounded-2xl shadow-lg hover:bg-naga-green-light transition-all">
+            <h3 class="text-lg font-bold">Teacher's Program</h3>
+            <p class="text-sm mt-1">View individual schedules for each teacher.</p>
+          </button>
+          <button id="viewClassProgramBtn" class="p-6 bg-naga-green-dark text-white rounded-2xl shadow-lg hover:bg-naga-green-light transition-all">
+            <h3 class="text-lg font-bold">Class Program</h3>
+            <p class="text-sm mt-1">View schedules for each class and grade level.</p>
+          </button>
+        </div>
+      </section>
+
+      <!-- School-wide Schedule View -->
+      <section id="school-schedule-view" class="hidden fade-in">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-bold text-naga-green-dark">School-wide Schedule</h2>
+          <div class="flex items-center gap-2">
+            <button id="export-school-btn" class="px-4 py-2 rounded-xl border hover:bg-gray-50 text-sm">Export to CSV</button>
+            <button id="backFromSchoolBtn" class="px-4 py-2 rounded-xl border hover:bg-gray-50">Back</button>
+          </div>
+        </div>
+        <div id="school-schedule-container"></div>
+      </section>
+
+      <!-- Teacher's Program View -->
+      <section id="teacher-program-view" class="hidden fade-in">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-bold text-naga-green-dark">Teacher's Program</h2>
+          <div class="flex items-center gap-2">
+            <button id="export-teacher-btn" class="px-4 py-2 rounded-xl border hover:bg-gray-50 text-sm">Export to CSV</button>
+            <button id="backFromTeacherBtn" class="px-4 py-2 rounded-xl border hover:bg-gray-50">Back</button>
+          </div>
+        </div>
+        <div class="max-w-sm w-full mb-4">
+          <label for="teacherSelector" class="block text-gray-700 text-sm font-semibold mb-1">Select a Teacher</label>
+          <select id="teacherSelector" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-naga-green-dark">
+            <option value="">Select a Teacher</option>
+          </select>
+        </div>
+        <div id="teacher-program-container" class="overflow-x-auto"></div>
+      </section>
+
+      <!-- Class Program View -->
+      <section id="class-program-view" class="hidden fade-in">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-bold text-naga-green-dark">Class Program</h2>
+          <div class="flex items-center gap-2">
+            <button id="export-class-btn" class="px-4 py-2 rounded-xl border hover:bg-gray-50 text-sm">Export to CSV</button>
+            <button id="backFromClassBtn" class="px-4 py-2 rounded-xl border hover:bg-gray-50">Back</button>
+          </div>
+        </div>
+        <div class="max-w-sm w-full mb-4">
+          <label for="classSelector" class="block text-gray-700 text-sm font-semibold mb-1">Select a Class</label>
+          <select id="classSelector" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-naga-green-dark">
+            <option value="">Select a Class</option>
+          </select>
+        </div>
+        <div id="class-program-container" class="overflow-x-auto"></div>
       </section>
     </div>
   </div>
@@ -191,7 +231,7 @@
       <textarea id="pasteArea" class="w-full border rounded-lg p-3 h-48" placeholder="e.g.,&#10;Juan Dela Cruz, Mathematics, Grade 7, A&#10;Maria Santos, English, Grade 7, A"></textarea>
       <div class="flex items-center justify-end gap-3 mt-4">
         <button id="cancelPasteBtn" class="px-4 py-2 rounded-xl border hover:bg-gray-50">Cancel</button>
-        <button id="applyPasteBtn" class="px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700">Add to Table</button>
+        <button id="applyPasteBtn" class="px-4 py-2 rounded-xl bg-naga-green-dark text-white hover:bg-naga-green-light">Add to Table</button>
       </div>
     </div>
   </div>
@@ -202,7 +242,7 @@
       <h3 id="modalTitle" class="text-lg font-bold mb-2 text-gray-900"></h3>
       <p id="modalMessage" class="text-sm text-gray-600 mb-6"></p>
       <div class="flex justify-end gap-2">
-        <button id="closeModalBtn" class="px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700">Close</button>
+        <button id="closeModalBtn" class="px-4 py-2 rounded-xl bg-naga-green-dark text-white hover:bg-naga-green-light">Close</button>
       </div>
     </div>
   </div>
@@ -212,7 +252,11 @@
     const setupView = document.getElementById('setup-view');
     const sectionsView = document.getElementById('sections-view');
     const mainView = document.getElementById('main-view');
-    const scheduleDisplay = document.getElementById('schedule-display');
+    const scheduleNavView = document.getElementById('schedule-nav-view');
+    const schoolScheduleView = document.getElementById('school-schedule-view');
+    const teacherProgramView = document.getElementById('teacher-program-view');
+    const classProgramView = document.getElementById('class-program-view');
+
     const programLevelSelect = document.getElementById('programLevel');
     const sectionsInputContainer = document.getElementById('sections-input-container');
     const timeDurationContainer = document.getElementById('time-duration-container');
@@ -228,24 +272,27 @@
 
     const schoolScheduleContainer = document.getElementById('school-schedule-container');
     const teacherProgramContainer = document.getElementById('teacher-program-container');
-    const teacherScheduleContainer = document.getElementById('teacher-schedule-container');
     const teacherSelector = document.getElementById('teacherSelector');
     const classProgramContainer = document.getElementById('class-program-container');
-    const classScheduleContainer = document.getElementById('class-schedule-container');
     const classSelector = document.getElementById('classSelector');
 
     const exportSchoolBtn = document.getElementById('export-school-btn');
     const exportTeacherBtn = document.getElementById('export-teacher-btn');
     const exportClassBtn = document.getElementById('export-class-btn');
 
-    const tabSchool = document.getElementById('tab-school');
-    const tabTeacher = document.getElementById('tab-teacher');
-    const tabClass = document.getElementById('tab-class');
-
     const proceedToSectionsBtn = document.getElementById('proceedToSectionsBtn');
     const proceedToMainBtn = document.getElementById('proceedToMainBtn');
     const backToSetupBtn = document.getElementById('backToSetupBtn');
     const backToSetupFromMainBtn = document.getElementById('backToSetupFromMainBtn');
+
+    const backToMainFromNavBtn = document.getElementById('backToMainFromNavBtn');
+    const backFromSchoolBtn = document.getElementById('backFromSchoolBtn');
+    const backFromTeacherBtn = document.getElementById('backFromTeacherBtn');
+    const backFromClassBtn = document.getElementById('backFromClassBtn');
+
+    const viewSchoolScheduleBtn = document.getElementById('viewSchoolScheduleBtn');
+    const viewTeacherProgramBtn = document.getElementById('viewTeacherProgramBtn');
+    const viewClassProgramBtn = document.getElementById('viewClassProgramBtn');
 
     const pasteModal = document.getElementById('pasteModal');
     const pasteArea = document.getElementById('pasteArea');
@@ -267,6 +314,7 @@
     let schoolSchedule = null; // generated schedule object
     let currentGrades = []; // Grades based on selected program level
     let timeDurations = []; // Editable time durations for periods
+    let classSections = {}; // Sections per grade level
 
     // Constants
     const subjects = [
@@ -274,15 +322,13 @@
     ];
     const subjectAbbreviations = { 'Math': 'Mathematics', 'AP': 'Araling Panlipunan', 'EsP': 'Edukasyon sa Pagpapakatao' };
 
-    // --- UPDATED PERIOD ARRAYS based on user request ---
     const scheduleItems = ['1st Period', '2nd Period', 'Recess', '3rd Period', '4th Period', '5th Period', 'Lunch', '6th Period', '7th Period', '8th Period'];
     const periods = ['1st Period', '2nd Period', '3rd Period', '4th Period', '5th Period', '6th Period', '7th Period', '8th Period'];
 
-    // Updated default time durations to match the new schedule items (10 total).
     const defaultTimeDurations = [
       '7:45 am - 8:35 am', '8:35 am - 9:25 am', '9:25 am - 10:15 am', '10:15 am - 10:30 am',
       '10:30 am - 11:20 am', '11:20 am - 12:10 pm', '12:10 pm - 1:00 pm', '1:00 pm - 1:50 pm',
-      '1:50 pm - 2:40 pm', '2:40 pm - 3:30 pm'
+      '1:50 pm - 2:40 pm', '2:40 pm - 3:30 pm', '3:30 pm - 4:20 pm'
     ];
     const gradeNames = ['Kinder','Grade 1','Grade 2','Grade 3','Grade 4','Grade 5','Grade 6','Grade 7','Grade 8','Grade 9','Grade 10','Grade 11','Grade 12'];
     const programGrades = {
@@ -294,7 +340,8 @@
 
     // --- Utilities ---
     const showView = (elToShow) => {
-      [setupView, sectionsView, mainView].forEach(el => el.classList.add('hidden'));
+      const allViews = [setupView, sectionsView, mainView, scheduleNavView, schoolScheduleView, teacherProgramView, classProgramView];
+      allViews.forEach(el => el.classList.add('hidden'));
       elToShow.classList.remove('hidden');
       elToShow.classList.add('fade-in');
       updateStepper();
@@ -302,44 +349,21 @@
 
     const updateStepper = () => {
       const step1Active = !setupView.classList.contains('hidden') || !sectionsView.classList.contains('hidden');
-      stepper1.querySelector('span').className = `flex items-center justify-center w-8 h-8 mr-2 text-sm font-medium rounded-full ${step1Active ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-700'}`;
-      stepper2.querySelector('span').className = `flex items-center justify-center w-8 h-8 mr-2 text-sm font-medium rounded-full ${mainView.classList.contains('hidden') ? 'bg-gray-200 text-gray-700' : 'bg-indigo-600 text-white'}`;
+      stepper1.querySelector('span').className = `flex items-center justify-center w-8 h-8 mr-2 text-sm font-medium rounded-full ${step1Active ? 'bg-naga-green-dark text-white' : 'bg-gray-200 text-gray-700'}`;
+      stepper2.querySelector('span').className = `flex items-center justify-center w-8 h-8 mr-2 text-sm font-medium rounded-full ${mainView.classList.contains('hidden') && scheduleNavView.classList.contains('hidden') ? 'bg-gray-200 text-gray-700' : 'bg-naga-green-dark text-white'}`;
     };
 
     const updateGenerateButtonState = () => {
       const hasContent = teachersInput.value.trim() !== '';
       if (hasContent) {
         generateBtn.classList.remove('bg-gray-400', 'cursor-not-allowed');
-        generateBtn.classList.add('bg-indigo-600', 'hover:bg-indigo-700');
+        generateBtn.classList.add('bg-naga-green-dark', 'hover:bg-naga-green-light');
         generateBtn.disabled = false;
       } else {
-        generateBtn.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
+        generateBtn.classList.remove('bg-naga-green-dark', 'hover:bg-naga-green-light');
         generateBtn.classList.add('bg-gray-400', 'cursor-not-allowed');
         generateBtn.disabled = true;
       }
-    };
-
-    const switchTab = (tabName) => {
-        const tabs = {
-            'school': schoolScheduleContainer,
-            'teacher': teacherProgramContainer,
-            'class': classProgramContainer
-        };
-
-        // Reset all tab buttons and content
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.classList.remove('bg-indigo-600', 'text-white');
-            btn.classList.add('bg-gray-200', 'text-gray-700');
-        });
-        document.querySelectorAll('.tab-content').forEach(content => {
-            content.classList.add('hidden');
-        });
-
-        // Activate selected tab
-        const selectedTabBtn = document.getElementById(`tab-${tabName}`);
-        selectedTabBtn.classList.remove('bg-gray-200', 'text-gray-700');
-        selectedTabBtn.classList.add('bg-indigo-600', 'text-white');
-        tabs[tabName].classList.remove('hidden');
     };
 
     const toast = (msg, type = 'info') => {
@@ -381,8 +405,17 @@
           for (let j = 0; j < cols.length; j++) {
               const col = cols[j];
               let cellData = '';
-              if (tableId === 'classProgramTable' && j > 0) {
-                  // Special handling for class program to format Subject - Teacher
+              if (tableId === 'schoolWideTable' && j > 0 && j < cols.length-1) {
+                  const subject = col.querySelector('.font-semibold');
+                  const teacher = col.querySelector('.text-xs');
+                  if (subject && teacher && teacher.innerText.trim() !== 'N/A') {
+                      cellData = `${subject.innerText.trim()} - ${teacher.innerText.trim()}`;
+                  } else if (subject) {
+                      cellData = subject.innerText.trim();
+                  } else {
+                      cellData = col.innerText.trim();
+                  }
+              } else if (tableId === 'classProgramTable' && j > 0) {
                   const subject = col.querySelector('.font-semibold');
                   const teacher = col.querySelector('.text-xs');
                   if (subject && teacher) {
@@ -393,9 +426,7 @@
               } else {
                   cellData = col.innerText.trim();
               }
-              // Replace newlines with a space for CSV formatting
               cellData = cellData.replace(/\s+/g, ' ');
-              // Escape quotes
               cellData = cellData.replace(/"/g, '""');
               rowData.push(`"${cellData}"`);
           }
@@ -416,19 +447,45 @@
     function generateTimeDurationInputs() {
       timeDurationContainer.innerHTML = '';
       timeDurations = [];
-      scheduleItems.forEach((item, index) => {
+
+      // Create two vertical columns for the inputs
+      const col1 = document.createElement('div');
+      col1.className = 'flex flex-col gap-4 w-full md:w-1/2';
+      const col2 = document.createElement('div');
+      col2.className = 'flex flex-col gap-4 w-full md:w-1/2';
+
+      // First column: 1st-4th period + Recess
+      const firstColumnItems = ['1st Period', '2nd Period', 'Recess', '3rd Period', '4th Period'];
+      firstColumnItems.forEach((item, i) => {
         const wrapper = document.createElement('div');
         wrapper.className = 'w-full';
         const labelText = item;
         const inputType = 'text';
-        const inputClass = `w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500`;
-        const inputValue = defaultTimeDurations[index] || '';
-
+        const inputClass = `w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-naga-green-dark`;
+        const inputValue = defaultTimeDurations[i] || '';
         wrapper.innerHTML = `
           <label class="block text-gray-700 text-sm font-semibold mb-1">${labelText}</label>
           <input type="${inputType}" value="${inputValue}" data-period="${item}" class="${inputClass}" />`;
-        timeDurationContainer.appendChild(wrapper);
+        col1.appendChild(wrapper);
       });
+
+      // Second column: 5th-8th period + Lunch
+      const secondColumnItems = ['5th Period', 'Lunch', '6th Period', '7th Period', '8th Period'];
+      secondColumnItems.forEach((item, i) => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'w-full';
+        const labelText = item;
+        const inputType = 'text';
+        const inputClass = `w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-naga-green-dark`;
+        const inputValue = defaultTimeDurations[i+5] || ''; // Adjust index for the second column
+        wrapper.innerHTML = `
+          <label class="block text-gray-700 text-sm font-semibold mb-1">${labelText}</label>
+          <input type="${inputType}" value="${inputValue}" data-period="${item}" class="${inputClass}" />`;
+        col2.appendChild(wrapper);
+      });
+
+      timeDurationContainer.appendChild(col1);
+      timeDurationContainer.appendChild(col2);
       getTimeDurationsFromInputs();
     }
 
@@ -448,7 +505,7 @@
         wrapper.className = 'w-full';
         wrapper.innerHTML = `
           <label class="block text-gray-700 text-sm font-semibold mb-1">Sections for ${gradeNames[gradeIdx]}</label>
-          <input type="number" min="1" value="1" data-grade="${gradeIdx}" class="section-count w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" />`;
+          <input type="number" min="1" value="1" data-grade="${gradeIdx}" class="section-count w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-naga-green-dark" />`;
         sectionsInputContainer.appendChild(wrapper);
       });
     }
@@ -467,13 +524,13 @@
     // Teacher table helpers
     function makeSubjectSelect(value = '') {
       const sel = document.createElement('select');
-      sel.className = 'w-full border rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500';
+      sel.className = 'w-full border rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-naga-green-dark';
       sel.innerHTML = `<option value="">Select</option>` + subjects.map(s=>`<option ${s===value?'selected':''}>${s}</option>`).join('');
       return sel;
     }
     function makeGradeSelect(value = '') {
       const sel = document.createElement('select');
-      sel.className = 'w-full border rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500';
+      sel.className = 'w-full border rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-naga-green-dark';
       const gradeOptions = currentGrades.map(gradeIdx => `<option value="${gradeIdx}" ${String(gradeIdx) === String(value) ? 'selected' : ''}>${gradeNames[gradeIdx]}</option>`).join('');
       sel.innerHTML = `<option value="">Select</option>` + gradeOptions;
       return sel;
@@ -545,22 +602,19 @@
 
     // Schedule generation
     function generateAndRenderSchoolSchedule() {
+      showLoader();
       schoolScheduleContainer.innerHTML = '';
       const { teachers, invalidLines } = parseTeachers();
       if (invalidLines.length) {
-        schoolScheduleContainer.innerHTML = `
-          <div class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-xl mb-4">
-            <div class="font-semibold">Invalid Teacher Data</div>
-            <ul class="list-disc ml-5 mt-1 text-sm">${invalidLines.map(l=>`<li>${l}</li>`).join('')}</ul>
-          </div>`;
+        hideLoader();
+        showMessageModal('Invalid Teacher Data', `<ul class="list-disc ml-5 mt-1 text-sm">${invalidLines.map(l=>`<li>${l}</li>`).join('')}</ul>`);
         return;
       }
       if (!teachers.length) {
-        schoolScheduleContainer.innerHTML = '<p class="text-center text-red-500 font-semibold">Please enter valid teacher data to generate a schedule.</p>';
+        hideLoader();
+        showMessageModal('No Teacher Data', 'Please enter valid teacher data to generate a schedule.');
         return;
       }
-
-      scheduleDisplay.classList.remove('hidden');
 
       // Build class assignments map
       const classAssignments = new Map();
@@ -617,7 +671,7 @@
       table.id = 'schoolWideTable';
       table.className = 'min-w-full bg-white rounded-xl overflow-hidden shadow border';
       const thead = document.createElement('thead');
-      thead.className = 'bg-indigo-600 text-white text-xs uppercase tracking-wide';
+      thead.className = 'bg-naga-green-dark text-white text-xs uppercase tracking-wide';
       const headRow = document.createElement('tr');
       headRow.innerHTML = `<th class="py-3 px-4 text-left sticky-col">TIME</th>` +
         [...classKeys].map(c => {
@@ -681,6 +735,7 @@
 
       populateTeacherSelector(teachers);
       populateClassSelector(classKeys);
+      hideLoader();
     }
 
     function populateTeacherSelector(teachers) {
@@ -713,7 +768,7 @@
     }
 
     function displaySelectedTeacherSchedule(teacherName) {
-      teacherScheduleContainer.innerHTML = '';
+      teacherProgramContainer.innerHTML = '';
       if (!teacherName) return;
       const teacherProgram = {}; scheduleItems.forEach(p=>teacherProgram[p] = { subject: 'Vacant', grade: '', section: '' });
       if (schoolSchedule) {
@@ -730,7 +785,7 @@
       table.id = 'teacherProgramTable';
       table.className = 'min-w-full bg-white rounded-xl overflow-hidden shadow border';
       const thead = document.createElement('thead');
-      thead.className = 'bg-indigo-600 text-white text-xs uppercase tracking-wide teacher-program';
+      thead.className = 'bg-naga-green-dark text-white text-xs uppercase tracking-wide teacher-program';
       thead.innerHTML = `<tr><th class="py-3 px-4 text-left sticky-col">TIME</th><th class="py-3 px-4 text-center">Subject</th><th class="py-3 px-4 text-center">Grade & Section</th></tr>`;
       const tbody = document.createElement('tbody'); tbody.className = 'text-gray-700 text-sm';
       scheduleItems.forEach((item, i)=>{
@@ -744,16 +799,16 @@
         }
         tbody.appendChild(tr);
       });
-      table.appendChild(thead); table.appendChild(tbody); teacherScheduleContainer.appendChild(table);
+      table.appendChild(thead); table.appendChild(tbody); teacherProgramContainer.appendChild(table);
     }
 
     function displaySelectedClassSchedule(classKey) {
-        classScheduleContainer.innerHTML = '';
+        classProgramContainer.innerHTML = '';
         if (!classKey) return;
 
         const dailySchedule = schoolSchedule[classKey];
         if (!dailySchedule) {
-            classScheduleContainer.innerHTML = `<p class="p-4 text-red-500">No schedule found for this class.</p>`;
+            classProgramContainer.innerHTML = `<p class="p-4 text-red-500">No schedule found for this class.</p>`;
             return;
         }
 
@@ -761,7 +816,7 @@
         table.id = 'classProgramTable';
         table.className = 'min-w-full bg-white rounded-xl overflow-hidden shadow border';
         const thead = document.createElement('thead');
-        thead.className = 'bg-indigo-600 text-white text-xs uppercase tracking-wide';
+        thead.className = 'bg-naga-green-dark text-white text-xs uppercase tracking-wide';
         const headRow = document.createElement('tr');
         headRow.innerHTML = `<th class="py-3 px-4 text-left sticky-col">TIME</th>` +
             daysOfWeek.map(day => `<th class="py-3 px-4 text-center">${day}</th>`).join('');
@@ -797,15 +852,22 @@
         });
 
         table.appendChild(thead); table.appendChild(tbody);
-        classScheduleContainer.appendChild(table);
+        classProgramContainer.appendChild(table);
     }
 
-    // Event listeners
+    // --- Main Logic & Event Listeners ---
+    function backToSetup() { showView(setupView); }
+    function backToMainView() { showView(mainView); }
+
     window.onload = () => {
       showView(setupView);
       generateTimeDurationInputs();
       updateGenerateButtonState();
     };
+
+    programLevelSelect.addEventListener('change', () => {
+      // No placeholder data is added here
+    });
 
     timeDurationContainer.addEventListener('input', () => {
       getTimeDurationsFromInputs();
@@ -822,96 +884,31 @@
 
     proceedToMainBtn.addEventListener('click', () => {
       const sectionsConfig = getSectionsConfig();
-      let placeholderLines = [];
-      for (const grade in sectionsConfig) {
-        const count = sectionsConfig[grade];
-        for (let j=1;j<=count;j++) {
-          const letter = String.fromCharCode('A'.charCodeAt(0) + j - 1);
-          placeholderLines.push(`// Enter teachers for ${gradeNames[grade]}, Section ${letter}`);
-        }
-      }
-      teachersInput.value = placeholderLines.join('\n');
+      classSections = sectionsConfig;
+      // No placeholder data is added here.
+      teachersInput.value = '';
       textareaToTable();
       showView(mainView);
-      toast('Now add teacher assignments, then click Generate.', 'info');
     });
 
-    backToSetupBtn.addEventListener('click', () => {
-      showView(setupView);
-    });
-
-    backToSetupFromMainBtn.addEventListener('click', () => {
-        showView(setupView);
-        teachersInput.value = '';
-        teacherTbody.innerHTML = '';
-        programLevelSelect.value = '';
-        sectionsInputContainer.innerHTML = '';
-        schoolScheduleContainer.innerHTML = '';
-        scheduleDisplay.classList.add('hidden');
-        schoolSchedule = null;
-        updateGenerateButtonState();
-    });
-
-    programLevelSelect.addEventListener('change', () => {
-      sectionsInputContainer.innerHTML = '';
-    });
-
-    generateBtn.addEventListener('click', async () => {
-      showLoader();
-      try { generateAndRenderSchoolSchedule(); }
-      finally { hideLoader(); }
-    });
-
-    teacherSelector.addEventListener('change', (e) => displaySelectedTeacherSchedule(e.target.value));
-    classSelector.addEventListener('change', (e) => displaySelectedClassSchedule(e.target.value));
-
-    // Tab button event listeners
-    tabSchool.addEventListener('click', () => switchTab('school'));
-    tabTeacher.addEventListener('click', () => switchTab('teacher'));
-    tabClass.addEventListener('click', () => switchTab('class'));
-
-    // Export button event listeners
-    exportSchoolBtn.addEventListener('click', () => {
-        exportTableToCsv('schoolWideTable', 'School-wide_Schedule.csv');
-    });
-    exportTeacherBtn.addEventListener('click', () => {
-        const teacherName = teacherSelector.value;
-        if (teacherName) {
-            exportTableToCsv('teacherProgramTable', `${teacherName}_Program.csv`);
-        } else {
-            toast('Please select a teacher first.', 'warning');
-        }
-    });
-    exportClassBtn.addEventListener('click', () => {
-        const classKey = classSelector.value;
-        if (classKey) {
-            exportTableToCsv('classProgramTable', `${classKey}_Program.csv`);
-        } else {
-            toast('Please select a class first.', 'warning');
-        }
-    });
+    backToSetupBtn.addEventListener('click', backToSetup);
+    backToSetupFromMainBtn.addEventListener('click', backToSetup);
 
     // Teacher table actions
-    addRowBtn.addEventListener('click', () => {
-      addTeacherRow();
-      tableToTextarea();
-    });
-    teacherTbody.addEventListener('click', (e) => {
-      if (e.target.closest('.remove-row')) {
-        e.target.closest('tr').remove();
-        tableToTextarea();
-      }
-    });
+    addRowBtn.addEventListener('click', () => { addTeacherRow(); tableToTextarea(); });
+    teacherTbody.addEventListener('click', (e) => { if (e.target.closest('.remove-row')) { e.target.closest('tr').remove(); tableToTextarea(); } });
     teacherTbody.addEventListener('change', tableToTextarea);
     teacherTbody.addEventListener('input', tableToTextarea);
-
+    
     // Paste modal
     importPasteBtn.addEventListener('click', ()=>{ pasteArea.value=''; pasteModal.classList.remove('hidden'); pasteModal.classList.add('visible'); });
     cancelPasteBtn.addEventListener('click', ()=>{ pasteModal.classList.remove('visible'); pasteModal.classList.add('hidden'); });
-    applyPasteBtn.addEventListener('click', ()=>{
+    applyPasteBtn.addEventListener('click', ()=> {
       const lines = pasteArea.value.split('\n').filter(Boolean);
       if (!lines.length) { toast('Nothing to add.', 'warning'); return; }
-      lines.forEach(l=>{ teachersInput.value += (teachersInput.value? '\n':'') + l; });
+      const newTeachersText = lines.join('\n');
+      const currentTeachersText = teachersInput.value.trim();
+      teachersInput.value = currentTeachersText ? currentTeachersText + '\n' + newTeachersText : newTeachersText;
       textareaToTable();
       toast('Pasted rows added.', 'success');
       pasteModal.classList.remove('visible'); pasteModal.classList.add('hidden');
@@ -919,6 +916,48 @@
 
     // Message modal close
     closeModalBtn.addEventListener('click', hideMessageModal);
+
+    generateBtn.addEventListener('click', () => {
+      showView(scheduleNavView);
+      generateAndRenderSchoolSchedule();
+    });
+
+    viewSchoolScheduleBtn.addEventListener('click', () => {
+      showView(schoolScheduleView);
+    });
+
+    viewTeacherProgramBtn.addEventListener('click', () => {
+      showView(teacherProgramView);
+      if (teacherSelector.value) {
+        displaySelectedTeacherSchedule(teacherSelector.value);
+      }
+    });
+    
+    teacherSelector.addEventListener('change', (e) => {
+      const v = e.target.value;
+      if (v) displaySelectedTeacherSchedule(v);
+    });
+
+    viewClassProgramBtn.addEventListener('click', () => {
+      showView(classProgramView);
+      if (classSelector.value) {
+        displaySelectedClassSchedule(classSelector.value);
+      }
+    });
+
+    classSelector.addEventListener('change', (e) => {
+        const v = e.target.value;
+        if (v) displaySelectedClassSchedule(v);
+    });
+
+    backToMainFromNavBtn.addEventListener('click', backToMainView);
+    backFromSchoolBtn.addEventListener('click', () => showView(scheduleNavView));
+    backFromTeacherBtn.addEventListener('click', () => showView(scheduleNavView));
+    backFromClassBtn.addEventListener('click', () => showView(scheduleNavView));
+    
+    exportSchoolBtn.addEventListener('click', () => exportTableToCsv('schoolWideTable', 'school-schedule.csv'));
+    exportTeacherBtn.addEventListener('click', () => exportTableToCsv('teacherProgramTable', 'teacher-program.csv'));
+    exportClassBtn.addEventListener('click', () => exportTableToCsv('classProgramTable', 'class-program.csv'));
   </script>
 </body>
 </html>
